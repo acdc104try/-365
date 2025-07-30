@@ -1,27 +1,12 @@
-{
-  "name": "kibuntyou365",
-  "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  },
-  "devDependencies": {
-    "vite": "^4.5.0",
-    "@vitejs/plugin-react": "^4.0.0"
-  }
-}import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+/// package.json { "name": "kibuntyou365", "version": "1.0.0", "private": true, "scripts": { "dev": "vite", "build": "vite build", "preview": "vite preview" }, "dependencies": { "react": "^18.2.0", "react-dom": "^18.2.0" }, "devDependencies": { "vite": "^5.0.0", "@vitejs/plugin-react": "^4.0.0" } }
 
-export default defineConfig({
-  plugins: [react()],
-})<!DOCTYPE html>
-<html lang="ja">
+/// vite.config.js import { defineConfig } from 'vite' import react from '@vitejs/plugin-react'
+
+export default defineConfig({ plugins: [react()], })
+
+/// index.html
+
+<!DOCTYPE html><html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -31,78 +16,50 @@ export default defineConfig({
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
-</html>import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App'
+</html>/// /src/main.jsx import React from 'react' import ReactDOM from 'react-dom/client' import App from './App'
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,import { useState } from 'react'
+ReactDOM.createRoot(document.getElementById('root')).render( <React.StrictMode> <App /> </React.StrictMode> )
 
-function App() {
-  const [good, setGood] = useState(50)
-  const [bad, setBad] = useState(50)
-  const [note, setNote] = useState('')
-  const [log, setLog] = useState([])
-  const [comment, setComment] = useState('')
+/// /src/App.jsx import { useState } from 'react'
 
-  const handleCheck = () => {
-    const now = new Date().toLocaleString()
+function App() { const [good, setGood] = useState(50) const [bad, setBad] = useState(50) const [note, setNote] = useState('') const [log, setLog] = useState([]) const [comment, setComment] = useState('')
 
-    const aiComment = bad > good
-      ? 'なにか心に残ったことがあれば話してみませんか？🌱'
-      : '今日は良い日だったようですね😊 明日もその調子で！'
+const handleCheck = () => { let result = '' if (good >= 70 && bad <= 30) { result = 'とても良いバランスですね。今の気持ちを大切に✨' } else if (good > bad) { result = '少し元気な様子ですね。何が良かったのか考えてみましょう😊' } else if (bad > good) { result = '気になることが多いかも。ひとつずつ整理してみましょう☁️' } else { result = '心が揺れているようですね。自分の気持ちをゆっくり観察してみてください🌿' }
 
-    setComment(aiComment)
+setComment(result)
+setLog([
+  ...log,
+  {
+    good,
+    bad,
+    note,
+    result,
+    time: new Date().toLocaleString(),
+  },
+])
 
-    setLog([
-      ...log,
-      { time: now, good, bad, note, comment: aiComment }
-    ])
-  }
-
-  return (
-    <div style={{ padding: 20, fontFamily: 'sans-serif' }}>
-      <h1>気分帳365🌤️</h1>
-      <p>良い気分（0〜100）</p>
-      <input type="number" value={good} onChange={(e) => setGood(Number(e.target.value))} />
-      <p>悪い気分（0〜100）</p>
-      <input type="number" value={bad} onChange={(e) => setBad(Number(e.target.value))} />
-      <p>今日のメモ</p>
-      <input
-        type="text"
-        value={note}
-        onChange={(e) => setNote(e.target.value)}
-        placeholder="例：アニメ観た・美味しいもの食べた"
-      />
-      <br /><br />
-      <button onClick={handleCheck}>AIコメントを見る</button>
-
-      {comment && (
-        <>
-          <h3>AIコメント:</h3>
-          <p>{comment}</p>
-        </>
-      )}
-
-      <h3>ログ:</h3>
-      <ul>
-        {log.map((entry, idx) => (
-          <li key={idx}>
-            [{entry.time}] 良: {entry.good} / 悪: {entry.bad}｜「{entry.note}」→ {entry.comment}
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
 }
 
-export default Apppackage.json
-vite.config.js
-/src
-  └── App.jsx
-  └── main.jsx
-/public
-  └── index.html
-)
+return ( <div style={{ padding: 20, fontFamily: 'sans-serif', maxWidth: 500, margin: 'auto' }}> <h1>気分帳365 🌤️</h1> <label> 良い気分（0〜100）: <input type="number" value={good} onChange={(e) => setGood(Number(e.target.value))} min={0} max={100} /> </label> <br /> <label> 悪い気分（0〜100）: <input type="number" value={bad} onChange={(e) => setBad(Number(e.target.value))} min={0} max={100} /> </label> <br /> <label> メモ： <input type="text" value={note} onChange={(e) => setNote(e.target.value)} placeholder="例：アニメ観て泣いた..." style={{ width: '100%' }} /> </label> <br /> <button onClick={handleCheck}>セラピストGPTに聞いてみる</button>
+
+{comment && (
+    <>
+      <h3>AIコメント：</h3>
+      <p>{comment}</p>
+    </>
+  )}
+
+  <h3>記録ログ：</h3>
+  <ul>
+    {log.map((entry, idx) => (
+      <li key={idx}>
+        [{entry.time}] 良い: {entry.good} / 悪い: {entry.bad}｜「{entry.note}」→ {entry.result}
+      </li>
+    ))}
+  </ul>
+</div>
+
+) }
+
+export default App
+
